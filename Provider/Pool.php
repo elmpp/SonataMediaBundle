@@ -28,8 +28,6 @@ class Pool
     protected $contexts = array();
 
     /**
-     * @deprecated Deprecated since version 3.1 and will be removed in 4.0. Use $downloadStrategies instead
-     *
      * @var DownloadStrategyInterface[]
      */
     protected $downloadSecurities = array();
@@ -84,15 +82,11 @@ class Pool
     }
 
     /**
-     * @deprecated Deprecated since version 3.1, to be removed in 4.0
-     *
      * @param string                    $name
      * @param DownloadStrategyInterface $security
      */
     public function addDownloadSecurity($name, DownloadStrategyInterface $security)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.1 and will be removed in 4.0.', E_USER_DEPRECATED);
-
         $this->downloadSecurities[$name] = $security;
 
         $this->addDownloadStrategy($name, $security);
