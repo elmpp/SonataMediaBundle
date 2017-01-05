@@ -341,13 +341,57 @@ class FileProvider extends BaseProvider
             return;
         }
 
-        // if the binary content is a filename => convert to a valid File
-        if (!is_file($media->getBinaryContent())) {
+        // added by mp ....
+      $fileLoc = $media->getBinaryContent();
+      if (filter_var($media->getBinaryContent(), FILTER_VALIDATE_URL)) {
+        $fileLoc = $this->downloadFile($media);
+      }
+
+
+      // if the binary content is a filename => convert to a valid File
+        if (!is_file($fileLoc)) {
             throw new \RuntimeException('The file does not exist : '.$media->getBinaryContent());
         }
 
-        $binaryContent = new File($media->getBinaryContent());
+        $binaryContent = new File($fileLoc);
         $media->setBinaryContent($binaryContent);
+    }
+
+  /**
+   * @param MediaInterface $media
+   * @throws \RuntimeException
+   */
+    protected function downloadFile(MediaInterface $media) {
+
+      $url = $media->getBinaryContent();
+      if (!$this->isDownloadable($url)) {
+        throw new \RuntimeException('The url does not point to a valid/reachable url : '.$url);
+      }
+
+      $tmpDir = sys_get_temp_dir() . '/media';
+      if (!is_dir($tmpDir)) mkdir($tmpDir);
+
+      if (rand(0,10) == 5) {
+        foreach(glob($tmpDir . '/*') as $file){
+          if(is_file($file))
+            unlink($file);
+        }
+      }
+
+      $filename = basename($url);
+      $temp = $tmpDir . '/' . $filename;
+      file_put_contents($temp, file_get_contents($url));
+      return $temp;
+    }
+
+    protected function isDownloadable($url) {
+
+      $headers = get_headers($url);
+      if($headers && strpos($headers[0], '200') !== false) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     /**

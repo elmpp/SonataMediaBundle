@@ -148,7 +148,7 @@ abstract class Media implements MediaInterface
      */
     public function __toString()
     {
-        return $this->getName() ?: 'n/a';
+        return $this->getName() ?: '';
     }
 
     public function prePersist()
