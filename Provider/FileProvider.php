@@ -12,6 +12,7 @@
 namespace Sonata\MediaBundle\Provider;
 
 use Gaufrette\Filesystem;
+use ImporterBundle\Util\Util;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\CoreBundle\Model\Metadata;
 use Sonata\CoreBundle\Validator\ErrorElement;
@@ -364,7 +365,7 @@ class FileProvider extends BaseProvider
     protected function downloadFile(MediaInterface $media) {
 
       $url = $media->getBinaryContent();
-      if (!$this->isDownloadable($url)) {
+      if (!Util::remoteFileExists($url)) {
         throw new \RuntimeException('The url does not point to a valid/reachable url : '.$url);
       }
 
@@ -378,20 +379,10 @@ class FileProvider extends BaseProvider
         }
       }
 
-      $filename = basename($url);
+      $filename = urldecode(basename($url));
       $temp = $tmpDir . '/' . $filename;
       file_put_contents($temp, file_get_contents($url));
       return $temp;
-    }
-
-    protected function isDownloadable($url) {
-
-      $headers = get_headers($url);
-      if($headers && strpos($headers[0], '200') !== false) {
-        return true;
-      } else {
-        return false;
-      }
     }
 
     /**
