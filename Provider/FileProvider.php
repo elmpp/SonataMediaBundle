@@ -351,7 +351,7 @@ class FileProvider extends BaseProvider
 
       // if the binary content is a filename => convert to a valid File
         if (!is_file($fileLoc)) {
-            throw new \RuntimeException('The file does not exist : '.$media->getBinaryContent());
+            throw new \RuntimeException('The file does not exist : '.$fileLoc.' Original url: '.$media->getBinaryContent());
         }
 
         $binaryContent = new File($fileLoc);
