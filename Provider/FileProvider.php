@@ -381,7 +381,36 @@ class FileProvider extends BaseProvider
 
       $filename = urldecode(basename($url));
       $temp = $tmpDir . '/' . $filename;
+
       file_put_contents($temp, file_get_contents($url));
+
+      // need to put a correct extension on the file is it does not have one
+      if (0 === preg_match("/([^\.]+)\.[a-z]{2,4}$/", $temp)) {
+        if (false === ($imageType = exif_imagetype($temp))) {
+          throw new \InvalidArgumentException("Url ${url} (and downloaded to ${temp})does not have an extension and exif_imagetype could not identify suitable type");
+        }
+        switch ($imageType) {
+          case IMAGETYPE_GIF:
+            $ext = 'gif';
+            break;
+          case IMAGETYPE_JPEG:
+          case IMAGETYPE_JPEG2000:
+            $ext = 'jpg';
+            break;
+          case IMAGETYPE_PNG:
+            $ext = 'png';
+            break;
+          case IMAGETYPE_SWF:
+            $ext = 'swf';
+            break;
+          default:
+            throw new \InvalidArgumentException("Url ${url} (and downloaded to ${temp})does not have an extension and exif_imagetype returned " . $imageType);
+        }
+        $withExt = "${temp}.${ext}";
+        rename($temp, $withExt);
+        return $withExt;
+      }
+
       return $temp;
     }
 
