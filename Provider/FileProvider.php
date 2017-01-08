@@ -344,7 +344,7 @@ class FileProvider extends BaseProvider
 
         // added by mp ....
       $fileLoc = $media->getBinaryContent();
-      if (filter_var($media->getBinaryContent(), FILTER_VALIDATE_URL)) {
+      if (!is_file($fileLoc)) {
         $fileLoc = $this->downloadFile($media);
       }
 
@@ -366,7 +366,7 @@ class FileProvider extends BaseProvider
 
       $url = $media->getBinaryContent();
       if (!Util::remoteFileExists($url)) {
-        throw new \RuntimeException('The url does not point to a valid/reachable url : '.$url);
+        throw new \RuntimeException('The binaryContent property does not point to a valid/reachable file or valid url : '.$url);
       }
 
       $tmpDir = sys_get_temp_dir() . '/media';
